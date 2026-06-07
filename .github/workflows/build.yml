@@ -9,15 +9,17 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install Rust
         run: |
           curl -fsSL https://sh.rustup.rs | sh -s -- -y --default-toolchain=stable --profile=minimal
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
-      - name: Build
-        run: cargo build
+      - name: Build and rename artifact
+        run: |
+          cargo build
+          mv target/debug/diffcsv target/debug/diffcsv-linux
 
       - name: Release
         uses: softprops/action-gh-release@v3
@@ -25,5 +27,26 @@ jobs:
           name: Pre-release
           prerelease: true
           overwrite_files: true
-          files: target/debug/diffcsv
+          files: target/debug/diffcsv-linux
           tag_name: pre-release-marker
+
+  Build-Windows:
+    runs-on: windows-2025
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Build and rename artifact
+        run: |
+          cargo build
+          Rename-Item target\debug\diffcsv target\debug\diffcsv-win
+
+      - name: Release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: Pre-release
+          prerelease: true
+          overwrite_files: true
+          files: target/debug/diffcsv-win
+          tag_name: pre-release-marker
+
