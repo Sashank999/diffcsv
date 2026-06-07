@@ -10,7 +10,7 @@ jobs:
       - name: Install Rust
         run: |
           curl -fsSL https://sh.rustup.rs | sh -s -- -y --default-toolchain=stable --profile=minimal
-          source "$HOME/.cargo/env"
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
       - name: Build
         run: cargo build
