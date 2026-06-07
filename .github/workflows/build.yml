@@ -4,6 +4,10 @@ on: workflow_dispatch
 permissions:
   contents: write
 
+concurrency:
+  group: pre-release
+  cancel-in-progress: true
+
 jobs:
   Build-Linux:
     runs-on: ubuntu-slim
@@ -16,10 +20,9 @@ jobs:
           curl -fsSL https://sh.rustup.rs | sh -s -- -y --default-toolchain=stable --profile=minimal
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
-      - name: Build and rename artifact
+      - name: Build
         run: |
           cargo build
-          mv target/debug/diffcsv target/debug/diffcsv-linux
 
       - name: Release
         uses: softprops/action-gh-release@v3
@@ -27,19 +30,19 @@ jobs:
           name: Pre-release
           prerelease: true
           overwrite_files: true
-          files: target/debug/diffcsv-linux
+          files: target/debug/diffcsv
           tag_name: pre-release-marker
 
   Build-Windows:
     runs-on: windows-2025
+    needs: Build-Linux
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Build and rename artifact
+      - name: Build
         run: |
-          cargo build
-          Rename-Item target\debug\diffcsv target\debug\diffcsv-win
+          cargo build --verbose
 
       - name: Release
         uses: softprops/action-gh-release@v3
@@ -47,6 +50,8 @@ jobs:
           name: Pre-release
           prerelease: true
           overwrite_files: true
-          files: target/debug/diffcsv-win
+          files: |
+            target/debug/diffcsv.exe
+            target/debug/diffcsv.pdb
           tag_name: pre-release-marker
 
