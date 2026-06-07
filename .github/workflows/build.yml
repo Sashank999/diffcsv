@@ -6,8 +6,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install Rust
+        run: curl -fsSL https://sh.rustup.rs | sh -s -- -y --default-toolchain=stable --profile=minimal
+
       - name: Build
         run: cargo build
+
       - name: Release
         uses: softprops/action-gh-release@v3
         with:
