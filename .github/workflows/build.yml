@@ -22,3 +22,4 @@ jobs:
           prerelease: true
           overwrite_files: true
           files: target/debug/diffcsv
+          tag_name: pre-release-marker
